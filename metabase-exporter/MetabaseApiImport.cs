@@ -37,7 +37,7 @@ namespace metabase_exporter
             await api.DeleteAllCards();
 
             Console.WriteLine("Creating cards...");
-            Database[] databases = await api.GetDatabases();
+            Database databases = await api.GetDatabases();
             var partialCardMapping = await state.Cards
                 .Traverse(async cardFromState => {
                     var source = cardFromState.Id;
@@ -194,7 +194,7 @@ namespace metabase_exporter
             return collectionMapping;
         }
 
-        static async Task<Card> MapAndCreateCard(this MetabaseApi api, Card cardFromState, IReadOnlyList<Mapping<Collection>> collectionMapping, IReadOnlyDictionary<DatabaseId, DatabaseId> databaseMapping, Database[] databases)
+        static async Task<Card> MapAndCreateCard(this MetabaseApi api, Card cardFromState, IReadOnlyList<Mapping<Collection>> collectionMapping, IReadOnlyDictionary<DatabaseId, DatabaseId> databaseMapping, Database databases)
         {
             if (cardFromState.DatasetQuery.Native == null)
             {
@@ -219,7 +219,7 @@ namespace metabase_exporter
                 {
                     string fieldIdentifier = (string)templateTag.Value.Dimension[1];
                     string[] fieldIdentifierParts = fieldIdentifier.Split('.');
-                    foreach (Database database in databases)
+                    foreach (DatabaseData database in databases.DatabaseData)
                     {
                         if (database.Name == fieldIdentifierParts[0])
                         {
@@ -238,7 +238,7 @@ namespace metabase_exporter
             return cardFromState;
         }
 
-        static async Task<int> FindFieldIdInDatabase(this MetabaseApi api, Database database, string schemaName, string tableName, string fieldName)
+        static async Task<int> FindFieldIdInDatabase(this MetabaseApi api, DatabaseData database, string schemaName, string tableName, string fieldName)
         {
             foreach (Table table in database.Tables)
             {

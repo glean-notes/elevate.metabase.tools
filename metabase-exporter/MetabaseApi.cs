@@ -199,11 +199,11 @@ namespace metabase_exporter
             return JsonConvert.DeserializeObject<Field>(response);
         }
 
-        public async Task<Database[]> GetDatabases()
+        public async Task<Database> GetDatabases()
         {
             HttpRequestMessage request() => new HttpRequestMessage(HttpMethod.Get, new Uri("/api/database?include=tables", UriKind.Relative));
             var response = await sessionManager.Send(request);
-            return JsonConvert.DeserializeObject<Database[]>(response);
+            return JsonConvert.DeserializeObject<Database>(response);
         }
 
         public async Task<TableWithFields> GetTableFields(int tableId)
@@ -257,8 +257,8 @@ namespace metabase_exporter
             var response = await sessionManager.Send(request);
             try
             {
-                var databases = JsonConvert.DeserializeObject<JArray>(response);
-                return databases.Select(d => new DatabaseId((int) d["id"])).ToList();
+                var databases = JsonConvert.DeserializeObject<JObject>(response);
+                return databases["data"].Select(d => new DatabaseId((int) d["id"])).ToList();
             }
             catch (JsonSerializationException e)
             {

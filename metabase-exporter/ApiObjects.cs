@@ -333,6 +333,12 @@ namespace metabase_exporter
 
     public class Database
     {
+        [JsonProperty("data")]
+        public DatabaseData[] DatabaseData { get; set; }
+    }
+
+    public class DatabaseData
+    {
         [JsonProperty("name")]
         public string Name { get; set; }
 
